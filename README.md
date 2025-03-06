@@ -1,1 +1,1 @@
-# lessismore
+# Less is More - Recipe Ingredient Analysis
