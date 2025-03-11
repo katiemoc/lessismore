@@ -138,7 +138,7 @@ The distribution of the `'n_ingredients'` column gives us insight of how many re
 
 <iframe
   src="assets/n_ingredients_hist.html"
-  width="800"
+  width="600"
   height="400"
   frameborder="0"
 ></iframe>
@@ -147,7 +147,7 @@ To contrast, the distribution of the `'avg_rating'` column shows us how recipes 
 
 <iframe
   src="assets/avg_rating_hist.html"
-  width="800"
+  width="600"
   height="400"
   frameborder="0"
 ></iframe>
@@ -158,7 +158,7 @@ The distribution of the `'rating'` column, conditioned on `'is_simple'`, compare
 
 <iframe
   src="assets/rating_cond_hist.html"
-  width="800"
+  width="600"
   height="400"
   frameborder="0"
 ></iframe>
@@ -186,7 +186,7 @@ The decline and overlap of all four aggregate lines at the right end of the grap
 
 <iframe
   src="assets/agg_line.html"
-  width="800"
+  width="600"
   height="400"
   frameborder="0"
 ></iframe>
@@ -223,7 +223,7 @@ The missingness of the `'rating'` column will be tested on the `'minutes'` and `
 
     <iframe
     src="assets/min_missing_fig.html"
-    width="800"
+    width="600"
     height="400"
     frameborder="0"
     ></iframe>
@@ -232,7 +232,7 @@ The missingness of the `'rating'` column will be tested on the `'minutes'` and `
 
     <iframe
     src="assets/ingr_missing_fig.html"
-    width="800"
+    width="600"
     height="400"
     frameborder="0"
     ></iframe>
@@ -243,13 +243,13 @@ The missingness of the `'rating'` column will be tested on the `'minutes'` and `
 
     **Minutes and Rating:**
     - **Null Hypothesis:** The missingness of the `rating` of a recipe depends on the amount of `minutes` it takes to complete.
-    - **Alternate Hypothesis:** The missingness of the `rating` of a recipe does not depend on the amount of `minutes` it takes to complete.
+    - **Alternative Hypothesis:** The missingness of the `rating` of a recipe does not depend on the amount of `minutes` it takes to complete.
 
-    After shuffling the `'rating_missing'` column and calculating the absolute difference in means 1000 times, the distribution for `'minutes'`, compared to the observed value, is shown below:
+    After shuffling the `'rating_missing'` column and calculating the absolute difference in means 1000 times, the distribution of differences, compared to the observed value, is shown below:
 
     <iframe
     src="assets/min_test_fig.html"
-    width="800"
+    width="600"
     height="400"
     frameborder="0"
     ></iframe>
@@ -258,13 +258,13 @@ The missingness of the `'rating'` column will be tested on the `'minutes'` and `
 
     **Number of Ingredients and Rating:**
     - **Null Hypothesis:** The missingness of the `rating` of a recipe depends on the number of `ingredients` it takes to make.
-    - **Alternate Hypothesis:** The missingness of the `rating` of a recipe does not depend on the number of `ingredients` it takes to make.
+    - **Alternative Hypothesis:** The missingness of the `rating` of a recipe does not depend on the number of `ingredients` it takes to make.
 
-    After shuffling the `'rating_missing'` column and calculating the absolute difference in means 1000 times, the distribution for `'n_ingredients'`, compared to the observed value, is shown below:
+    After shuffling the `'rating_missing'` column and calculating the absolute difference in means 1000 times, the distribution of differences, compared to the observed value, is shown below:
 
     <iframe
     src="assets/ingr_test_fig.html"
-    width="800"
+    width="600"
     height="400"
     frameborder="0"
     ></iframe>
@@ -275,6 +275,22 @@ The missingness of the `'rating'` column will be tested on the `'minutes'` and `
 
 ## Hypothesis Testing
 
+**What is the relationship between the number of ingredients and average rating of a recipe?** This section performs a permutation test using the `avg_rating` and `is_simple` columns under the following hypotheses:
+- **Null Hypothesis**: The average rating of recipes is the same for those with more than five ingredients and those with at most five ingredients.
+- **Alternative Hypothesis**: Recipes with more than five ingredients have a lower average rating.
+
+Since our alternative hypothesis indicates a direction, our test statistic will be the **signed difference in group means.** Our significance level is **0.05.**
+
+After shuffling the `'is_simple'` column and calculating the mean difference 1000 times, the distribution of differences, compared to the observed value, is shown below:
+
+<iframe
+src="assets/ingr_test_fig.html"
+width="600"
+height="400"
+frameborder="0"
+></iframe>
+
+**Conclusion**: The observed statistic is **-0.037**. The p-value is **0.0**, which is **smaller** than 0.05. Thus, we **reject** the null hypothesis and have significant evidence that recipes with more than five ingredients have a lower average rating.
 
 
 
