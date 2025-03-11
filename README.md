@@ -94,10 +94,10 @@ To allow for easy analysis, the following cleaning steps were executed, in this 
     - `'nutrition'` contains lists of numbers.
 
 7. Consider a recipe to be "simple" if it has at most 5 ingredients. Create a new column `'is_simple'`.
+    - Helpful for future hypothesis testing.
     - Looks at `'n_ingredients'` and returns a boolean value.
         - `True` if the recipe has more than 5 ingredients.
         - `False` if the recipe has 5 or less ingredients.
-    - Helpful for future hypothesis testing.
 
 The column data types and first 5 *unique* rows of the newly cleaned DataFrame, **`merged`**, are shown below. 
 
@@ -122,8 +122,7 @@ The column data types and first 5 *unique* rows of the newly cleaned DataFrame, 
 | `'avg_rating'` | float64 |
 | `'is_simple'` | bool |
  
-**Cleaned Dataset: `merged`** - 234429 rows, 18 columns
-> Note: not all columns in the table are shown for clarity-- I chose the most relevant ones. Scroll right to view more.
+**Cleaned Dataset: `merged`** - 234429 rows, 18 columns (*Note: Only the most relevant columns are shown, for clarity. Scroll right to view more.*)
 
 | recipe_id | name | minutes | recipe_date | n_steps | tags | ingredients | n_ingredients | review_date | rating | avg_rating | simple |
 |----------:|:-----|--------:|:------------|--------:|:-----|:------------|--------------:|:------------|-------:|-----------:|:-------|
@@ -135,12 +134,12 @@ The column data types and first 5 *unique* rows of the newly cleaned DataFrame, 
 
 ### Univariate Analysis
 
-The distribution of the `n_ingredients` column gives us insight of how many recipes are "simple." The graph appears normal with a right skew-- showing a few recipes with a large amount of ingredients, with the maximum being 35! This figure also shows that more recipes posted on <a href='https://food.com'>food.com</a> have more than 5 ingredients. The number of recipes and reviews increase as the number of ingredients increase from 1 to 8, while they start decreasing from 9 onwards.
+The distribution of the `'n_ingredients'` column gives us insight of how many recipes are "simple." The graph appears normal with a right skew-- showing a few recipes with a large amount of ingredients, with the maximum being 35! This figure also shows that more recipes posted on <a href='https://food.com'>food.com</a> have more than 5 ingredients. The number of recipes and reviews increase as the number of ingredients increase from 1 to 8, while they start decreasing from 9 onwards.
 
 <iframe
   src="assets/n_ingredients_hist.html"
-  width="1000"
-  height="500"
+  width="800"
+  height="400"
   frameborder="0"
 ></iframe>
 
@@ -148,8 +147,8 @@ To contrast, the distribution of the `'avg_rating'` column shows us how recipes 
 
 <iframe
   src="assets/avg_rating_hist.html"
-  width="1000"
-  height="500"
+  width="800"
+  height="400"
   frameborder="0"
 ></iframe>
 
@@ -159,8 +158,8 @@ The distribution of the `'rating'` column, conditioned on `'is_simple'`, compare
 
 <iframe
   src="assets/rating_cond_hist.html"
-  width="1000"
-  height="500"
+  width="800"
+  height="400"
   frameborder="0"
 ></iframe>
 
@@ -183,12 +182,12 @@ The aggregates between the `'n_ingredients'` and `'n_steps'` columns highlight a
 
 It is intuitive to believe that as the the number of ingredients increase, so would the number of steps. The figure below follows this belief, as there is a slight increase in the min, mean, and median lines as the number of ingredients increase. These three aggregates share a similar pattern near the lower end of the graph, showing that majority of recipes, regardless of their ingredient count, have around 20 or less steps. However, the max line fluctuates between 50 and 100 throughout the entire graph, highlighting that any number of ingredients may still require many steps. 
 
-The decline of all four aggregate lines at the right end of the graph can be explained by the fact that there are some ingredient counts with only one recipe match. This would cause all four aggregates to be the same value.
+The decline and overlap of all four aggregate lines at the right end of the graph can be explained by the fact that there are some ingredient counts with only one recipe match. This causes all four aggregates to be the same value.
 
 <iframe
   src="assets/agg_line.html"
-  width="1000"
-  height="500"
+  width="800"
+  height="400"
   frameborder="0"
 ></iframe>
 
@@ -196,6 +195,81 @@ The decline of all four aggregate lines at the right end of the graph can be exp
 
 ## Assessment of Missingness
 
+Four columns in the **`merged`** DataFrame have missing values: `'description'`, `'rating'`, `'review'`, and `'avg_rating'`. The missingness in the `'avg_rating'` column is missing by design since it strictly uses information from the `'rating'` column. Therefore, this section explores the missingness of the `'rating'` column.
+
+| Column | Number of Missing Values |
+|--------|--------------------------|
+| `'description'` | 114 |
+| `'rating'` | 15036 |
+| `'review'` | 58 |
+| `'avg_rating'` | 2777 |
+
+### NMAR Analysis
+
+The missingness of the `'review'` column is arguably not missing at random (NMAR) for one main reason: people simply do not feel like leaving reviews on recipes they do not care for. Reviewers are more likely to express their opinions and spend their time writing a review only if they feel strongly about how good or bad a recipe is. People also need to be interested enough to make the recipe in the first place. Hence, the `'review'` column is missing when someone chooses not to explain their rating, or if a recipe has no ratings at all. This information could be utilized to identify unpopular recipes and what should be done to either improve or promote these recipes.
+
+### Missingness Dependency
+
+The missingness of the `'rating'` column will be tested on the `'minutes'` and `'n_ingredients'` columns. Since the distribution of the missing values will be compared to the distribution of non-missing values, this requires permutation testing. The following steps were executed:
+
+1. Create a new column `'rating_missing'` to store boolean values.
+    - True if `'rating'` is missing (`NaN`).
+    - False if `'rating'` is not missing.
+
+2. Explore the distributions of `'minutes'` and `'n_ingredients'`, conditioned on `'rating_missing'`.
+    - Helps us determine what test statistic to use.
+
+    For `'minutes'`, the distributions are very similar and both show a decreasing trend. As the number of minutes increase, the proportion of recipes decrease, regardless of rating missingness. Additionally, a larger proportion of recipes with missing ratings have smaller completion times, while recipes with ratings have larger completion times.
+
+    <iframe
+    src="assets/min_missing_fig.html"
+    width="800"
+    height="400"
+    frameborder="0"
+    ></iframe>
+
+    For `'n_ingredients'`, the distributions are again very similar, but follow a bell curve with right skew. As the number of ingredients increase, the proportion of recipes also increase until peaking at 9 and decreasing after that. Though slight, a larger proportion of recipes with missing ratings have less ingredients, while recipes with ratings have more ingredients.
+
+    <iframe
+    src="assets/ingr_missing_fig.html"
+    width="800"
+    height="400"
+    frameborder="0"
+    ></iframe>
+
+    Since both of the figures above show similar distributions, the test statistic of the permutation tests will be absolute difference in group means.
+
+3. Perform permutation tests, using **absolute difference in group means** and significance level **0.05**.
+
+    **Minutes and Rating:**
+    - **Null Hypothesis:** The missingness of the `rating` of a recipe depends on the amount of `minutes` it takes to complete.
+    - **Alternate Hypothesis:** The missingness of the `rating` of a recipe does not depend on the amount of `minutes` it takes to complete.
+
+    After shuffling the `'rating_missing'` column and calculating the absolute difference in means 1000 times, the distribution for `'minutes'`, compared to the observed value, is shown below:
+
+    <iframe
+    src="assets/min_test_fig.html"
+    width="800"
+    height="400"
+    frameborder="0"
+    ></iframe>
+
+    **Conclusion**: The observed statistic is **51.452**. The p-value is **0.123**, which is **larger** than 0.05. Thus, we **fail to reject** the null hypothesis and do **not** have significant evidence that the missingness of the `'ratings'` column depends on the completion time of a recipe.
+
+    **Number of Ingredients and Rating:**
+    - **Null Hypothesis:** The missingness of the `rating` of a recipe depends on the number of `ingredients` it takes to make.
+    - **Alternate Hypothesis:** The missingness of the `rating` of a recipe does not depend on the number of `ingredients` it takes to make.
+
+    After shuffling the `'rating_missing'` column and calculating the absolute difference in means 1000 times, the distribution for `'n_ingredients'`, compared to the observed value, is shown below:
+
+    <iframe
+    src="assets/ingr_test_fig.html"
+    width="800"
+    height="400"
+    frameborder="0"
+    ></iframe>
+
+    **Conclusion**: The observed statistic is **1.339**. The p-value is **0.0**, which is **smaller** than 0.05. Thus, we **reject** the null hypothesis and  have significant evidence that the missingness of the `'ratings'` column does depend on the number of ingredients in a recipe.
 
 
 
