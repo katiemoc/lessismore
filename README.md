@@ -186,8 +186,8 @@ The decline and overlap of all four aggregate lines at the right end of the grap
 
 <iframe
   src="assets/agg_line.html"
-  width="600"
-  height="400"
+  width="800"
+  height="500"
   frameborder="0"
 ></iframe>
 
@@ -206,7 +206,7 @@ Four columns in the **`merged`** DataFrame have missing values: `'description'`,
 
 ### NMAR Analysis
 
-The missingness of the `'review'` column is arguably not missing at random (NMAR) for one main reason: people simply do not feel like leaving reviews on recipes they do not care for. Reviewers are more likely to express their opinions and spend their time writing a review only if they feel strongly about how good or bad a recipe is. People also need to be interested enough to make the recipe in the first place. Hence, the `'review'` column is missing when someone chooses not to explain their rating, or if a recipe has no ratings at all. This information could be utilized to identify unpopular recipes and what should be done to either improve or promote these recipes.
+The missingness in the `'review'` column is arguably not missing at random (NMAR) for one main reason: people simply do not feel like leaving reviews on recipes they do not care for. Reviewers are more likely to express their opinions and spend their time writing a review only if they feel strongly about how good or bad a recipe is. People also need to be interested enough to make the recipe in the first place. Hence, the `'review'` column is missing when someone chooses not to explain their rating, or if a recipe has no ratings at all. This information could be utilized to identify unpopular recipes and what should be done to either improve or promote these recipes.
 
 ### Missingness Dependency
 
@@ -242,14 +242,14 @@ The missingness of the `'rating'` column will be tested on the `'minutes'` and `
 3. Perform permutation tests, using **absolute difference in group means** and significance level **0.05**.
 
     **Minutes and Rating:**
-    - **Null Hypothesis:** The missingness of the `rating` of a recipe depends on the amount of `minutes` it takes to complete.
-    - **Alternative Hypothesis:** The missingness of the `rating` of a recipe does not depend on the amount of `minutes` it takes to complete.
+    - **Null Hypothesis:** The missingness of the `'rating'` of a recipe depends on the time it takes to complete.
+    - **Alternative Hypothesis:** The missingness of the `'rating'` of a recipe does not depend on the time it takes to complete.
 
     After shuffling the `'rating_missing'` column and calculating the absolute difference in means 1000 times, the distribution of differences, compared to the observed value, is shown below:
 
     <iframe
     src="assets/min_test_fig.html"
-    width="600"
+    width="800"
     height="400"
     frameborder="0"
     ></iframe>
@@ -257,14 +257,14 @@ The missingness of the `'rating'` column will be tested on the `'minutes'` and `
     **Conclusion**: The observed statistic is **51.452**. The p-value is **0.123**, which is **larger** than 0.05. Thus, we **fail to reject** the null hypothesis and do **not** have significant evidence that the missingness of the `'ratings'` column depends on the completion time of a recipe.
 
     **Number of Ingredients and Rating:**
-    - **Null Hypothesis:** The missingness of the `rating` of a recipe depends on the number of `ingredients` it takes to make.
-    - **Alternative Hypothesis:** The missingness of the `rating` of a recipe does not depend on the number of `ingredients` it takes to make.
+    - **Null Hypothesis:** The missingness of the `'rating'` of a recipe depends on the number of ingredients it takes to make.
+    - **Alternative Hypothesis:** The missingness of the `'rating'` of a recipe does not depend on the number of ingredients it takes to make.
 
     After shuffling the `'rating_missing'` column and calculating the absolute difference in means 1000 times, the distribution of differences, compared to the observed value, is shown below:
 
     <iframe
     src="assets/ingr_test_fig.html"
-    width="600"
+    width="800"
     height="400"
     frameborder="0"
     ></iframe>
@@ -275,7 +275,7 @@ The missingness of the `'rating'` column will be tested on the `'minutes'` and `
 
 ## Hypothesis Testing
 
-**What is the relationship between the number of ingredients and average rating of a recipe?** This section performs a permutation test using the `avg_rating` and `is_simple` columns under the following hypotheses:
+**What is the relationship between the number of ingredients and average rating of a recipe?** This section performs a permutation test using the `'avg_rating'` and `'is_simple'` columns under the following hypotheses:
 - **Null Hypothesis**: The average rating of recipes is the same for those with more than five ingredients and those with at most five ingredients.
 - **Alternative Hypothesis**: Recipes with more than five ingredients have a lower average rating.
 
@@ -285,7 +285,7 @@ After shuffling the `'is_simple'` column and calculating the mean difference 100
 
 <iframe
 src="assets/ingr_test_fig.html"
-width="600"
+width="800"
 height="400"
 frameborder="0"
 ></iframe>
@@ -296,20 +296,64 @@ frameborder="0"
 
 ## Framing a Prediction Problem
 
+Let us now create a model that **predicts the average rating** of a recipe. We will treat this as a **regression** problem, since the average rating is a quantitative continuous value between 1.0 and 5.0. Therefore, the response variable is the `'avg_rating'` column-- it is a fair representation of each recipe over all of its reviews. In the previous section, we found that there is a significant difference between simple and complex recipes, so it will be interesting to explore this further.
+
+We know from our exploratory data analysis that some relationships between columns and `'avg_rating'` do not show a linear trend. Therefore, for this model, we will use the **`RandomForestRegressor`**, along with the mean absolute error as the metric. Some columns have a large range of values, and the mean absolute error is more robust to outliers, so it is more ideal than mean squared error in this case.
+
+Since we are predicting the average rating, the information known at the time of prediction are all columns from the original `recipe` dataset. This is because a person must read and create the recipe in order to properly rate it.
 
 
 
 ## Baseline Model
 
+Earlier, we found that the missingness of the `'rating'` column does depend on the `'n_steps'` and `'n_ingredients'` columns. The baseline model will try to predict a recipe's `'avg_rating'` with the same two columns to discover if this missingness dependency might also help predict the average rating. Both of these columns contain **quantitative** values, so no encodings were applied. 
 
+After splitting the data into training and testing sets, training the model with the random forest regressor, and calculating its predictions, the baseline model achieved a mean absolute error of **0.3356** on the training set, and **0.3386** on the test set. Since the two mean absolute errors are very, this baseline model is arguably "good" because it can generalize the data well, rather than over or underfitting it.
 
 
 ## Final Model
 
+The goal of the final model is to **further minimize the mean absolute error** while also ensuring this new model can **generalize** the data well. We will add two more features: `'minutes'` and `'recipe_date'`. While we will transform these new features, the two original features, `'n_steps'` and `'n_ingredients'`, remain the same.
+
+The relationship between the `'minutes'` and `'avg_rating'` columns shows that majority of high rated recipes have shorter completion times. This could improve our model by utilizing the difference in ratings for various completion times. Arguably, recipes that take longer to prepare suggest a larger probability of making a mistake. To this column, we apply a **`QuantileTransformer`** because its range of values is vast, from 0 to over 1 million minutes. This transformer maps the data into a normal distribution, so that the model is more robust to outliers. The transformed `'minutes'` column contains **quantitative** values.
+
+The relationship between the `'recipe_date'` and `'avg_rating'` columns reveals that the average rating of recipes fluctuates from 2008 to 2014, but strictly declines from 2014 to 2018. This could improve our model by factoring in how recent the recipe was posted. To this column, we apply a **`FunctionTransformer`** so we can track the average recipe ratings over time. Through hyperparameter testing, the model will decide between two functions:
+
+- `extract_year()`: simply extracts the year that the recipe was posted
+- `days_since()`: calculates the number of days since the first recipe was posted
+
+The transformed `'recipe_date'` column contains **quantitative** values regardless of the chosen function.
+
+Furthermore, hyperparameter testing will also help choose the `n_estimators` and `max_depth` of our `RandomForestRegressor`. This will ensure that the model, which utilizes decision trees, does not overfit the training data nor fail to generalize the data. Using `GridSearchCV`, the combination of hyperparameters that best minimizes the mean absolute error is the **`days_since` function, `max_depth = 20`, and `n_estimators = 75`**.
+
+Under the same training and test sets as the baseline model, the new model achieved a mean absolute error of **0.2177** for the training set, and **0.2581** for the test set. The two mean absolute errors are again, relatively similar, with a difference of only about 0.04. The new model seems to generalize the data well, and has a lower mean absolute error than the baseline model! 
 
 
 
 ## Fairness Analysis
 
+Our final model has improved, but is it fair? We will test the fairness of our final model on 'simple' and 'complex' recipes-- that is, recipes with 5 or less ingredients, compared to recipes with more than 5.
 
+**Group X:** Recipes with 5 or less ingredients, or **simple** recipes
 
+**Group Y:** Recipes with more than 5 ingredients, or **complex** recipes
+
+**Evaluation Metric:** Root mean squared error, or **RMSE**
+- The RMSE is a better choice than R-squared in this case because we want to test the accuracy of our predictions, rather than determine the explainability of a predictor variable.
+
+We will utilize the `is_simple` column for our permutation test with the following hypotheses:
+- **Null Hypothesis:** Our model is fair. Its RMSE for simple recipes and complex recipes are roughly the same, and any differences are due to random chance.
+- **Alternative Hypothesis:** Our model is unfair. Its RMSE for simple recipes is significantly different than its RMSE for complex recipes.
+- **Test Statistic:** Absolute difference in RMSE (|simple - complex|)
+- **Significance Level:** 0.05
+
+After shuffling the `'is_simple'` column and calculating the absolute difference in RMSE 1000 times, the distribution of differences, compared to the observed value, is shown below:
+
+<iframe
+src="assets/rmse_fig.html"
+width="800"
+height="400"
+frameborder="0"
+></iframe>
+
+**Conclusion:** The observed statistic is **0.06**. Since our p-value, 0.0, is **less than 0.5**, we **reject** the null hypothesis and have **significant** evidence to believe our model is **not fair**. The model's RMSE for simple recipes is significantly different than its RMSE for complex recipes.
