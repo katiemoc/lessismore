@@ -344,7 +344,7 @@ Our final model has improved, but is it fair? We will test the fairness of our f
 We will utilize the `is_simple` column for our permutation test with the following hypotheses:
 - **Null Hypothesis:** Our model is fair. Its RMSE for simple recipes and complex recipes are roughly the same, and any differences are due to random chance.
 - **Alternative Hypothesis:** Our model is unfair. Its RMSE for simple recipes is significantly different than its RMSE for complex recipes.
-- **Test Statistic:** Absolute difference in RMSE (|simple - complex|)
+- **Test Statistic:** Absolute difference in RMSE (\|simple - complex\|)
 - **Significance Level:** 0.05
 
 After shuffling the `'is_simple'` column and calculating the absolute difference in RMSE 1000 times, the distribution of differences, compared to the observed value, is shown below:
