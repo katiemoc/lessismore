@@ -180,7 +180,7 @@ The aggregates between the `'n_ingredients'` and `'n_steps'` columns highlight a
 |               9 |  9.81518 |        9 |     1 |    88 |
 |              10 | 10.6835  |       10 |     1 |    57 |
 
-It is intuitive to believe that as the the number of ingredients increase, so would the number of steps. The figure below follows this belief, as there is a slight increase in the min, mean, and median lines as the number of ingredients increase. These three aggregates share a similar pattern near the lower end of the graph, showing that majority of recipes, regardless of their ingredient count, have around 20 or less steps. However, the max line fluctuates between 50 and 100 throughout the entire graph, highlighting that any number of ingredients may still require many steps. 
+It is intuitive to believe that as the number of ingredients increase, so would the number of steps. The figure below follows this belief, as there is a slight increase in the min, mean, and median lines as the number of ingredients increase. These three aggregates share a similar pattern near the lower end of the graph, showing that majority of recipes, regardless of their ingredient count, have around 20 or less steps. However, the max line fluctuates between 50 and 100 throughout the entire graph, highlighting that any number of ingredients may still require many steps. 
 
 The decline and overlap of all four aggregate lines at the right end of the graph can be explained by the fact that there are some ingredient counts with only one recipe match. This causes all four aggregates to be the same value.
 
@@ -296,9 +296,9 @@ frameborder="0"
 
 ## Framing a Prediction Problem
 
-Let us now create a model that **predicts the average rating** of a recipe. We will treat this as a **regression** problem, since the average rating is a quantitative continuous value between 1.0 and 5.0. Therefore, the response variable is the `'avg_rating'` column-- it is a fair representation of each recipe over all of its reviews. In the previous section, we found that there is a significant difference between simple and complex recipes, so it will be interesting to explore this further.
+Let us now create a model that **predicts the average rating** of a recipe. We will treat this as a **regression** problem, since the average rating is a quantitative continuous value between 1.0 and 5.0. Therefore, the response variable is the `'avg_rating'` column-- it is a fair representation of each recipe over all of its reviews. In the previous section, we found that there is a significant difference between the average rating of simple and complex recipes, so it will be interesting to explore this further.
 
-We know from our exploratory data analysis that some relationships between columns and `'avg_rating'` do not show a linear trend. Therefore, for this model, we will use the **`RandomForestRegressor`**, along with the mean absolute error as the metric. Some columns have a large range of values, and the mean absolute error is more robust to outliers, so it is more ideal than mean squared error in this case.
+We know from our exploratory data analysis that some relationships between columns and `'avg_rating'` do not show a linear trend. Therefore, for this model, we will use the **`RandomForestRegressor`**, along with the **mean absolute error** as the metric. Some columns have a large range of values, and the mean absolute error is more robust to outliers, so it is more ideal than mean squared error in this case.
 
 Since we are predicting the average rating, the information known at the time of prediction are all columns from the original `recipe` dataset. This is because a person must read and create the recipe in order to properly rate it.
 
@@ -319,8 +319,8 @@ The relationship between the `'minutes'` and `'avg_rating'` columns shows that m
 
 The relationship between the `'recipe_date'` and `'avg_rating'` columns reveals that the average rating of recipes fluctuates from 2008 to 2014, but strictly declines from 2014 to 2018. This could improve our model by factoring in how recent the recipe was posted. To this column, we apply a **`FunctionTransformer`** so we can track the average recipe ratings over time. Through hyperparameter testing, the model will decide between two functions:
 
-- `extract_year()`: simply extracts the year that the recipe was posted
-- `days_since()`: calculates the number of days since the first recipe was posted
+- `extract_year()`: simply extracts the year that the inputted recipe was posted
+- `days_since()`: calculates the number of days between the earliest posted recipe, which is January 1st, 2008, and the inputted recipe.
 
 The transformed `'recipe_date'` column contains **quantitative** values regardless of the chosen function.
 
