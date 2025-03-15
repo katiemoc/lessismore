@@ -186,7 +186,7 @@ The decline and overlap of all four aggregate lines at the right end of the grap
 
 <iframe
   src="assets/agg_line.html"
-  width="900"
+  width="950"
   height="500"
   frameborder="0"
 ></iframe>
