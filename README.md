@@ -186,7 +186,7 @@ The decline and overlap of all four aggregate lines at the right end of the grap
 
 <iframe
   src="assets/agg_line.html"
-  width="800"
+  width="900"
   height="500"
   frameborder="0"
 ></iframe>
@@ -356,4 +356,4 @@ height="400"
 frameborder="0"
 ></iframe>
 
-**Conclusion:** The observed statistic is **0.06**. Since our p-value, 0.0, is **less than 0.5**, we **reject** the null hypothesis and have **significant** evidence to believe our model is **not fair**. The model's RMSE for simple recipes is significantly different than its RMSE for complex recipes.
+**Conclusion:** The observed statistic is **0.069**. Since our p-value, 0.0, is **less than 0.5**, we **reject** the null hypothesis and have **significant** evidence to believe our model is **not fair**. The model's RMSE for simple recipes is significantly different than its RMSE for complex recipes.
