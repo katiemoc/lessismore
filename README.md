@@ -269,7 +269,7 @@ The missingness of the `'rating'` column will be tested on the `'minutes'` and `
     frameborder="0"
     ></iframe>
 
-    **Conclusion**: The observed statistic is **1.339**. The p-value is **0.0**, which is **smaller** than 0.05. Thus, we **reject** the null hypothesis and  have significant evidence that the missingness of the `'ratings'` column does depend on the number of ingredients in a recipe.
+    **Conclusion**: The observed statistic is **0.161**. The p-value is **0.0**, which is **smaller** than 0.05. Thus, we **reject** the null hypothesis and  have significant evidence that the missingness of the `'ratings'` column does depend on the number of ingredients in a recipe.
 
 
 
