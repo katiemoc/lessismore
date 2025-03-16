@@ -264,7 +264,7 @@ The missingness of the `'rating'` column will be tested on the `'minutes'` and `
 
     <iframe
     src="assets/ingr_test_fig.html"
-    width="800"
+    width="1000"
     height="400"
     frameborder="0"
     ></iframe>
